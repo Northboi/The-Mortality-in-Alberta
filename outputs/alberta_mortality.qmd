@@ -1,0 +1,247 @@
+---
+title: "Title"
+author: 
+  - Shiji Zhang, Zongcheng Cao
+thanks: "Code and data are available at: https://github.com/Northboi/The-Mortality-in-Alberta"
+date: today
+date-format: long
+format: pdf
+number-sections: true
+toc: TRUE
+---
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+if(!require(tidyverse)){install.packages('tidyverse', dependencies = TRUE)}
+if(!require(boot)){install.packages('boot', dependencies = TRUE)}
+if(!require(broom.mixed)){install.packages('broom.mixed', dependencies = TRUE)}
+if(!require(collapse)){install.packages('collapse', dependencies = TRUE)}
+if(!require(dataverse)){install.packages('dataverse', dependencies = TRUE)}
+if(!require(gutenbergr)){install.packages('gutenbergr', dependencies = TRUE)}
+if(!require(janitor)){install.packages('janitor', dependencies = TRUE)}
+if(!require(knitr)){install.packages('knitr', dependencies = TRUE)}
+if(!require(marginaleffects)){install.packages('marginaleffects', dependencies = TRUE)}
+if(!require(modelsummary)){install.packages('modelsummary', dependencies = TRUE)}
+if(!require(rstanarm)){install.packages('rstanarm', dependencies = TRUE)}
+
+library(tidyverse)
+library(boot)
+library(broom.mixed)
+library(collapse)
+library(dataverse)
+library(gutenbergr)
+library(janitor)
+library(knitr)
+library(marginaleffects)
+library(modelsummary)
+library(rstanarm)
+```
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+alberta_cod <-
+  read_csv(
+    "https://open.alberta.ca/dataset/03339dc5-fb51-4552-97c7-853688fc428d/resource/3e241965-fee3-400e-9652-07cfbf0c0bda/download/deaths-leading-causes.csv",
+    skip = 2,
+    col_types = cols(
+      `Calendar Year` = col_integer(),
+      Cause = col_character(),
+      Ranking = col_integer(),
+      `Total Deaths` = col_integer()
+    )
+  ) |>
+  clean_names() |>
+  add_count(cause) |>
+  mutate(cause = str_trunc(cause, 30))
+
+write_csv(
+  x = alberta_cod,
+  file = "../inputs/data/alberta_cod.csv"
+)
+
+```
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+library("janitor")
+library("knitr")
+library("lubridate")
+library("tidyverse")
+
+
+# Clean and transform the data
+alberta_cod_clean <- alberta_cod%>%
+  # Ensure total_deaths is numeric and replace non-numeric values with NA
+  mutate(total_deaths = as.numeric(total_deaths))
+
+# Remove rows with NA
+alberta_cod_clean <- alberta_cod_clean %>%
+  dplyr::filter(!is.na(total_deaths))
+
+head(alberta_cod_clean)
+
+write_csv(
+  x = alberta_cod_clean,
+  file = "../inputs/data/alberta_cod_clean.csv"
+) 
+```
+\newpage
+
+# Intoduction
+
+# Data
+
+The open dataset used for this analysis is named “Leading Causes of Death” from the government of Alberta. The dataset gives information about the 30 leading causes of mortality in the province of Alberta, and provides a ranking of these death causes by the total number of deaths. The causes of death used in the dataset is based on the International Classification of Diseases 10th Edition. The dataset included complete information from 2001 to 2022, and it is updated annually from 2001, the last update happened in September, 2023. Therefore, ever since the year of 2001, 30 leading reasons of death will be added to the dataset every year, with the number of deaths caused by there reasons, and there are chances for a cause to exist in the ranking for multiple years. A variable “n” in the dataset will count the number of times for each specific cause of death to enter the ranking. 
+
+Variables:
+There are 
+Calendar Year: A string variable, indicates the specific year of each cause of death was recorded in the ranking.  
+Cause: A string variable, provides the name of each reason for death, if a leading cause entered the ranking for more than one year, then there will be multiple records with the same “Cause” variable.  
+Ranking: An integer variable from 1 to 30, demonstrates the place of the cause of death in the ranking for a specific year. 
+Total Deaths: An integer variable, 
+n: An integer variable, counts the number of times for a specific cause of death enter the ranking, which is equivalent to the number of times for a specific cause of death appears in the dataset until the latest update. 
+
+
+```{r}
+#| label: tbl-one
+#| fig-cap: "aaa"
+#| echo: false
+#| warning: false
+#| message: false
+
+alberta_cod_clean |>
+  filter(
+    calendar_year == 2003,
+    ranking <= 15
+  ) |>
+  mutate(total_deaths = format(total_deaths, big.mark = ",")) |>
+  kable(
+    col.names = c("Year", "Cause", "Ranking", "Deaths", "Years"),
+    align = c("l", "r", "r", "r", "r"),
+    digits = 0, booktabs = TRUE, linesep = ""
+  )
+```
+
+# Result
+
+# Discuss
+
+# Discuss
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+alberta_cod_top_five <-
+  alberta_cod_clean |>
+  filter(
+    calendar_year == 2003,
+    n == 22
+  ) |>
+  slice_max(order_by = desc(ranking), n = 5) |>
+  pull(cause)
+
+alberta_cod_clean <-
+  alberta_cod_clean |>
+  filter(cause %in% alberta_cod_top_five)
+```
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+alberta_cod_clean |>
+  ggplot(aes(x = calendar_year, y = total_deaths, color = cause)) +
+  geom_line() +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  labs(x = "Year", y = "Annual number of deaths in Alberta") +
+  facet_wrap(vars(cause), dir = "v", ncol = 1) +
+  theme(legend.position = "none")
+```
+
+```{r results='hide'}
+#| echo: false
+#| warning: false
+#| message: false
+
+cause_of_death_alberta_poisson <-
+  stan_glm(
+    total_deaths ~ cause,
+    data = alberta_cod_clean,
+    family = poisson(link = "log"),
+    seed = 25038
+  )
+
+cause_of_death_alberta_neg_binomial <-
+  stan_glm(
+    total_deaths ~ cause,
+    data = alberta_cod_clean,
+    family = neg_binomial_2(link = "log"),
+    seed = 25038
+  )
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+coef_short_names <- 
+  c("(Intercept)"
+    = "(Intercept)",
+    "causeAll other forms of chronic ..."
+    = "causeAll other forms of...",
+    "causeMalignant neoplasms of trac..."
+    = "causeMalignant neoplas...",
+    "causeAtherosclerotic cardiovascu..."
+    = "causeAtherosclero...",
+    "causeStroke, not specified as he..."
+    = "causeStroke..."
+    )
+
+modelsummary(
+  list(
+    "Poisson" = cause_of_death_alberta_poisson,
+    "Negative binomial" = cause_of_death_alberta_neg_binomial
+  ),
+  coef_map = coef_short_names
+)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+pp_check(cause_of_death_alberta_poisson) +
+  theme(legend.position = "bottom")
+
+pp_check(cause_of_death_alberta_neg_binomial) +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+poisson <- loo(cause_of_death_alberta_poisson, cores = 2)
+neg_binomial <- loo(cause_of_death_alberta_neg_binomial, cores = 2)
+
+loo_compare(poisson, neg_binomial)
+```
+\newpage
+
+# Reference
