@@ -47,12 +47,12 @@ replication
   - tab5_replication.R
   - tab6_replication.R
 - tables - stores the replicated tables
-  -Table1.csv
-  -Table2.csv
-  -Table3.csv
-  -Table4.csv
-  -Table5.csv
-  -Table6.csv
+  - Table1.csv
+  - Table2.csv
+  - Table3.csv
+  - Table4.csv
+  - Table5.csv
+  - Table6.csv
 
 
 ## LLMs statement
