@@ -1,0 +1,19 @@
+part,term,statistic,Poisson,Negative binomial
+estimates,(Intercept),estimate,7.037,7.038
+estimates,(Intercept),std.error,,(0.039)
+estimates,causeAll other forms of...,estimate,0.446,0.446
+estimates,causeAll other forms of...,std.error,,(0.054)
+estimates,causeMalignant neoplas...,estimate,0.223,0.223
+estimates,causeMalignant neoplas...,std.error,,(0.053)
+estimates,causeAtherosclero...,estimate,-0.436,-0.436
+estimates,causeAtherosclero...,std.error,,(0.054)
+estimates,causeStroke...,estimate,-0.531,-0.532
+estimates,causeStroke...,std.error,,(0.054)
+gof,Num.Obs.,,110,110
+gof,Log.Lik.,,-1080.186,-698.855
+gof,ELPD,,-1110.0,-701.6
+gof,ELPD s.e.,,88.7,4.6
+gof,LOOIC,,2220.0,1403.2
+gof,LOOIC s.e.,,177.3,9.2
+gof,WAIC,,2220.5,1403.1
+gof,RMSE,,109.33,109.33

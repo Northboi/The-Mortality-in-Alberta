@@ -1,0 +1,6 @@
+"Column","Type","Description"
+"calendar year","num","Indicating the specific year of each cause of death was recorded in the ranking."
+"causes","str","Providing the name of each reason for death. If a leading cause entered the ranking for more than one year, then there will be multiple records with the same 'Cause' variable."
+"ranking","num","Demonstrating the place of the cause of death in the ranking for a specific year."
+"total deaths","num","Counting the number of times a specific cause of death entered the ranking, which is equivalent to the number of times a specific cause of death appears in the dataset until the latest update."
+"n","num","Counting the number of times a specific cause of death entered the ranking, which is equivalent to the number of times a specific cause of death appears in the dataset until the latest update."
