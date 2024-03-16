@@ -57,7 +57,7 @@ replication
 
 ## LLMs statement
 
-Most of the code in the paper and in R markdown is written by ChatGPT. And all conversations I had with ChatGPT can be viewed from inputs/llm/usage.txt.
+Most of the code in the paper and in R markdown is written by ChatGPT. And all conversations I had with ChatGPT can be viewed from inputs/llm/usage.txt
 
 ## Reproducibility
 
