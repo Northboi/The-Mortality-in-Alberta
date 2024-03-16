@@ -7,7 +7,9 @@ Medical technology continues to advance. The leading causes of death in the 2000
 inputs
 - data - contains all the data files to be used for analysis and in the tables and figures
   - alberta_cod.csv - dataset includes the variables of "calender_year", "cause", "ranking", "total_deaths", "n"
+  - alberta_cod.parquet
   - alberta_cod_clean.csv - A cleaned version of alberta_cod.csv that clean the rows contain NA and (Blank) value
+  - alberta_cod_clean.parquet
 - llm
   - usage.txt - The conversation history with ChatGPT
 - sketches

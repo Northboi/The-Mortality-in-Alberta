@@ -35,6 +35,7 @@ if(!require(ggplot2)){install.packages('ggplot2', dependencies = TRUE)}
 if(!require(lubridate)){install.packages('lubridate', dependencies = TRUE)}
 if(!require(kableExtra)){install.packages('kableExtra', dependencies = TRUE)}
 if(!require(gridExtra)){install.packages('gridExtra', dependencies = TRUE)}
+if(!require(arrow)){install.packages('arrow', dependencies = TRUE)}
 
 library(tidyverse)
 library(boot)
@@ -51,6 +52,7 @@ library(ggplot2)
 library(lubridate)
 library(kableExtra)
 library(gridExtra)
+library(arrow)
 ```
 
 ```{r results='hide'}
@@ -77,6 +79,10 @@ write_csv(
   x = alberta_cod,
   file = "../inputs/data/alberta_cod.csv"
 )
+
+write_parquet(x = alberta_cod,
+              sink = "../inputs/data/alberta_cod.parquet")
+
 
 ```
 
@@ -105,6 +111,8 @@ write_csv(
   file = "../inputs/data/alberta_cod_clean.csv"
 )
 
+write_parquet(x = alberta_cod,
+              sink = "../inputs/data/alberta_cod_clean.parquet")
 ```
 \newpage
 

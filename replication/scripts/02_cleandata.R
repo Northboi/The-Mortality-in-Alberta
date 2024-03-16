@@ -19,3 +19,6 @@ write_csv(
   file = "inputs/data/alberta_cod_clean.csv"
 )
 
+write_parquet(x = alberta_cod,
+              sink = "inputs/data/alberta_cod_clean.parquet")
+
